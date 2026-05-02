@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>03_DSMemo</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>04_ds_memo</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7332,7 +7332,12 @@ a.anchor-link {
     if (!diagrams.length) {
       return;
     }
-    const mermaid = (await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs")).default;
+    const mermaid = (await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.10.0/mermaid.esm.min.mjs")).default;
+    const elkUrl = "https://cdnjs.cloudflare.com/ajax/libs/mermaid-layout-elk/0.1.9/mermaid-layout-elk.esm.min.mjs";
+    if(elkUrl) {
+      const elkLayouts = (await import(elkUrl)).default;
+      mermaid.registerLayoutLoaders(elkLayouts);
+    }
     const parser = new DOMParser();
 
     mermaid.initialize({
@@ -7429,7 +7434,8 @@ a.anchor-link {
      * Post-process to ensure mermaid diagrams contain only valid SVG and XHTML.
      */
     function cleanMermaidSvg(svg) {
-      return svg.replace(RE_VOID_ELEMENT, replaceVoidElement);
+      svg = svg.replace(RE_VOID_ELEMENT, replaceVoidElement);
+      return `${SVG_XML_HEADER}${svg}`;
     }
 
 
@@ -7455,6 +7461,285 @@ a.anchor-link {
       }
       return `<${tag} ${rest}>`;
     }
+
+
+  /**
+   * Named HTML entities with their decimal equivalent codes.
+   *
+   * @see https://www.w3.org/TR/WD-html40-970708/sgml/entities.html
+   * */
+  const HTML_ENTITIES = `<!ENTITY Aacute "&#193;">
+<!ENTITY aacute "&#225;">
+<!ENTITY Acirc "&#194;">
+<!ENTITY acirc "&#226;">
+<!ENTITY acute "&#180;">
+<!ENTITY AElig "&#198;">
+<!ENTITY aelig "&#230;">
+<!ENTITY Agrave "&#192;">
+<!ENTITY agrave "&#224;">
+<!ENTITY alefsym "&#8501;">
+<!ENTITY Alpha "&#913;">
+<!ENTITY alpha "&#945;">
+<!ENTITY amp "&#38;">
+<!ENTITY and "&#8869;">
+<!ENTITY ang "&#8736;">
+<!ENTITY Aring "&#197;">
+<!ENTITY aring "&#229;">
+<!ENTITY asymp "&#8776;">
+<!ENTITY Atilde "&#195;">
+<!ENTITY atilde "&#227;">
+<!ENTITY Auml "&#196;">
+<!ENTITY auml "&#228;">
+<!ENTITY bdquo "&#8222;">
+<!ENTITY Beta "&#914;">
+<!ENTITY beta "&#946;">
+<!ENTITY brvbar "&#166;">
+<!ENTITY bull "&#8226;">
+<!ENTITY cap "&#8745;">
+<!ENTITY Ccedil "&#199;">
+<!ENTITY ccedil "&#231;">
+<!ENTITY cedil "&#184;">
+<!ENTITY cent "&#162;">
+<!ENTITY Chi "&#935;">
+<!ENTITY chi "&#967;">
+<!ENTITY circ "&#710;">
+<!ENTITY clubs "&#9827;">
+<!ENTITY cong "&#8773;">
+<!ENTITY copy "&#169;">
+<!ENTITY crarr "&#8629;">
+<!ENTITY cup "&#8746;">
+<!ENTITY curren "&#164;">
+<!ENTITY dagger "&#8224;">
+<!ENTITY Dagger "&#8225;">
+<!ENTITY darr "&#8595;">
+<!ENTITY dArr "&#8659;">
+<!ENTITY deg "&#176;">
+<!ENTITY Delta "&#916;">
+<!ENTITY delta "&#948;">
+<!ENTITY diams "&#9830;">
+<!ENTITY divide "&#247;">
+<!ENTITY Eacute "&#201;">
+<!ENTITY eacute "&#233;">
+<!ENTITY Ecirc "&#202;">
+<!ENTITY ecirc "&#234;">
+<!ENTITY Egrave "&#200;">
+<!ENTITY egrave "&#232;">
+<!ENTITY empty "&#8709;">
+<!ENTITY emsp "&#8195;">
+<!ENTITY ensp "&#8194;">
+<!ENTITY epsilon "&#949;">
+<!ENTITY Epsilon "&#917;">
+<!ENTITY equiv "&#8801;">
+<!ENTITY Eta "&#919;">
+<!ENTITY eta "&#951;">
+<!ENTITY ETH "&#208;">
+<!ENTITY eth "&#240;">
+<!ENTITY Euml "&#203;">
+<!ENTITY euml "&#235;">
+<!ENTITY exist "&#8707;">
+<!ENTITY fnof "&#402;">
+<!ENTITY forall "&#8704;">
+<!ENTITY frac12 "&#189;">
+<!ENTITY frac14 "&#188;">
+<!ENTITY frac34 "&#190;">
+<!ENTITY frasl "&#8260;">
+<!ENTITY Gamma "&#915;">
+<!ENTITY gamma "&#947;">
+<!ENTITY ge "&#8805;">
+<!ENTITY gt "&#62;">
+<!ENTITY harr "&#8596;">
+<!ENTITY hArr "&#8660;">
+<!ENTITY hearts "&#9829;">
+<!ENTITY hellip "&#8230;">
+<!ENTITY Iacute "&#205;">
+<!ENTITY iacute "&#237;">
+<!ENTITY Icirc "&#206;">
+<!ENTITY icirc "&#238;">
+<!ENTITY iexcl "&#161;">
+<!ENTITY Igrave "&#204;">
+<!ENTITY igrave "&#236;">
+<!ENTITY image "&#8465;">
+<!ENTITY infin "&#8734;">
+<!ENTITY int "&#8747;">
+<!ENTITY Iota "&#921;">
+<!ENTITY iota "&#953;">
+<!ENTITY iquest "&#191;">
+<!ENTITY isin "&#8712;">
+<!ENTITY Iuml "&#207;">
+<!ENTITY iuml "&#239;">
+<!ENTITY Kappa "&#922;">
+<!ENTITY kappa "&#954;">
+<!ENTITY Lambda "&#923;">
+<!ENTITY lambda "&#955;">
+<!ENTITY lang "&#9001;">
+<!ENTITY laquo "&#171;">
+<!ENTITY larr "&#8592;">
+<!ENTITY lArr "&#8656;">
+<!ENTITY lceil "&#8968;">
+<!ENTITY ldquo "&#8220;">
+<!ENTITY le "&#8804;">
+<!ENTITY lfloor "&#8970;">
+<!ENTITY lowast "&#8727;">
+<!ENTITY loz "&#9674;">
+<!ENTITY lrm "&#8206;">
+<!ENTITY lsaquo "&#8249;">
+<!ENTITY lsquo "&#8216;">
+<!ENTITY lt "&#60;">
+<!ENTITY macr "&#175;">
+<!ENTITY mdash "&#8212;">
+<!ENTITY micro "&#181;">
+<!ENTITY middot "&#183;">
+<!ENTITY minus "&#8722;">
+<!ENTITY Mu "&#924;">
+<!ENTITY mu "&#956;">
+<!ENTITY nabla "&#8711;">
+<!ENTITY nbsp "&#160;">
+<!ENTITY ndash "&#8211;">
+<!ENTITY ne "&#8800;">
+<!ENTITY ni "&#8715;">
+<!ENTITY not "&#172;">
+<!ENTITY notin "&#8713;">
+<!ENTITY nsub "&#8836;">
+<!ENTITY Ntilde "&#209;">
+<!ENTITY ntilde "&#241;">
+<!ENTITY Nu "&#925;">
+<!ENTITY nu "&#957;">
+<!ENTITY Oacute "&#211;">
+<!ENTITY oacute "&#243;">
+<!ENTITY Ocirc "&#212;">
+<!ENTITY ocirc "&#244;">
+<!ENTITY OElig "&#338;">
+<!ENTITY oelig "&#339;">
+<!ENTITY Ograve "&#210;">
+<!ENTITY ograve "&#242;">
+<!ENTITY oline "&#8254;">
+<!ENTITY Omega "&#937;">
+<!ENTITY omega "&#969;">
+<!ENTITY Omicron "&#927;">
+<!ENTITY omicron "&#959;">
+<!ENTITY oplus "&#8853;">
+<!ENTITY or "&#8870;">
+<!ENTITY ordf "&#170;">
+<!ENTITY ordm "&#186;">
+<!ENTITY Oslash "&#216;">
+<!ENTITY oslash "&#248;">
+<!ENTITY Otilde "&#213;">
+<!ENTITY otilde "&#245;">
+<!ENTITY otimes "&#8855;">
+<!ENTITY Ouml "&#214;">
+<!ENTITY ouml "&#246;">
+<!ENTITY para "&#182;">
+<!ENTITY part "&#8706;">
+<!ENTITY permil "&#8240;">
+<!ENTITY perp "&#8869;">
+<!ENTITY Phi "&#934;">
+<!ENTITY phi "&#966;">
+<!ENTITY Pi "&#928;">
+<!ENTITY pi "&#960;">
+<!ENTITY piv "&#982;">
+<!ENTITY plusmn "&#177;">
+<!ENTITY pound "&#163;">
+<!ENTITY prime "&#8242;">
+<!ENTITY Prime "&#8243;">
+<!ENTITY prod "&#8719;">
+<!ENTITY prop "&#8733;">
+<!ENTITY Psi "&#936;">
+<!ENTITY psi "&#968;">
+<!ENTITY quot "&#34;">
+<!ENTITY radic "&#8730;">
+<!ENTITY rang "&#9002;">
+<!ENTITY raquo "&#187;">
+<!ENTITY rarr "&#8594;">
+<!ENTITY rArr "&#8658;">
+<!ENTITY rceil "&#8969;">
+<!ENTITY rdquo "&#8221;">
+<!ENTITY real "&#8476;">
+<!ENTITY reg "&#174;">
+<!ENTITY rfloor "&#8971;">
+<!ENTITY Rho "&#929;">
+<!ENTITY rho "&#961;">
+<!ENTITY rlm "&#8207;">
+<!ENTITY rsaquo "&#8250;">
+<!ENTITY rsquo "&#8217;">
+<!ENTITY sbquo "&#8218;">
+<!ENTITY Scaron "&#352;">
+<!ENTITY scaron "&#353;">
+<!ENTITY sdot "&#8901;">
+<!ENTITY sect "&#167;">
+<!ENTITY shy "&#173;">
+<!ENTITY Sigma "&#931;">
+<!ENTITY sigma "&#963;">
+<!ENTITY sigmaf "&#962;">
+<!ENTITY sim "&#8764;">
+<!ENTITY spades "&#9824;">
+<!ENTITY sub "&#8834;">
+<!ENTITY sube "&#8838;">
+<!ENTITY sum "&#8721;">
+<!ENTITY sup "&#8835;">
+<!ENTITY sup1 "&#185;">
+<!ENTITY sup2 "&#178;">
+<!ENTITY sup3 "&#179;">
+<!ENTITY supe "&#8839;">
+<!ENTITY szlig "&#223;">
+<!ENTITY Tau "&#932;">
+<!ENTITY tau "&#964;">
+<!ENTITY there4 "&#8756;">
+<!ENTITY Theta "&#920;">
+<!ENTITY theta "&#952;">
+<!ENTITY thetasym "&#977;">
+<!ENTITY thinsp "&#8201;">
+<!ENTITY THORN "&#222;">
+<!ENTITY thorn "&#254;">
+<!ENTITY tilde "&#732;">
+<!ENTITY times "&#215;">
+<!ENTITY trade "&#8482;">
+<!ENTITY Uacute "&#218;">
+<!ENTITY uacute "&#250;">
+<!ENTITY uarr "&#8593;">
+<!ENTITY uArr "&#8657;">
+<!ENTITY Ucirc "&#219;">
+<!ENTITY ucirc "&#251;">
+<!ENTITY Ugrave "&#217;">
+<!ENTITY ugrave "&#249;">
+<!ENTITY uml "&#168;">
+<!ENTITY upsih "&#978;">
+<!ENTITY Upsilon "&#933;">
+<!ENTITY upsilon "&#965;">
+<!ENTITY Uuml "&#220;">
+<!ENTITY uuml "&#252;">
+<!ENTITY weierp "&#8472;">
+<!ENTITY Xi "&#926;">
+<!ENTITY xi "&#958;">
+<!ENTITY Yacute "&#221;">
+<!ENTITY yacute "&#253;">
+<!ENTITY yen "&#165;">
+<!ENTITY Yuml "&#376;">
+<!ENTITY yuml "&#255;">
+<!ENTITY Zeta "&#918;">
+<!ENTITY zeta "&#950;">
+<!ENTITY zwj "&#8205;">
+<!ENTITY zwnj "&#8204;">`.replace(/\n/g, ' ');
+
+  /**
+   * A reasonably strict xml declaration.
+   */
+  const XML_DECL = '<?xml version="1.0" standalone="no"?>';
+
+  /**
+   * The beginning of the XML doctype declaration.
+   */
+  const DOCTYPE_START = `<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [`;
+
+  /**
+   * The end of the XML docype declaration.
+   */
+  const DOCTYPE_END = ']>';
+
+  /**
+   * A full header for an SVG XML document.
+   */
+  const SVG_XML_HEADER = `${XML_DECL}
+    ${DOCTYPE_START}${HTML_ENTITIES}${DOCTYPE_END}`;
 
     void Promise.all([...diagrams].map(renderOneMarmaid));
   });
@@ -7542,7 +7827,7 @@ p {
 <li>The adoption of policies such as sentence reduction incentives, automatic enrollment, and centralized administration</li>
 <li>The broader strategy for reducing recidivism and improving post-release outcomes</li>
 </ul>
-<p>The goal of this memo is to inform policy decisions by identifying which education-related policies are most effective in reducing recidivism.</p>
+<p>The goal of this memo is to summarize the updated evidence on education policies and recidivism, with clear guidance on what is supported, what is uncertain, and what should be evaluated next.</p>
 </div>
 </div>
 </div>
@@ -7564,21 +7849,11 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Executive-Summary">Executive Summary<a class="anchor-link" href="#Executive-Summary">¶</a></h1><p>The United States incarcerates approximately 1.8–1.9 million individuals, with over 1.25 million held in state and federal prisons alone, representing the highest incarceration rate globally. High recidivism rates place sustained economic and social strain on communities, families, and correctional systems.</p>
-<p>A central objective of incarceration is rehabilitation, with recidivism—defined here as a return to prison after release—serving as a key measure of success. While education programs have historically been used to support rehabilitation, their effectiveness varies depending on how they are implemented across states.</p>
-<p>This analysis evaluates how education-related policies influence recidivism, focusing on two approaches: the expansion of educational access through the Pell Second Chance Program (post-2016), and variation in state-level policy design, including central administration, automatic enrollment, and sentence reduction incentives.</p>
-<ul>
-<li><p><strong>Pell Second Chance Program:</strong> A policy that restores access to federal Pell Grants, allowing incarcerated individuals to enroll in postsecondary education programs while in prison.</p>
-</li>
-<li><p><strong>Sentence Reduction Incentives:</strong> Policies that reduce an individual’s prison sentence in exchange for successful completion of educational programs.</p>
-</li>
-<li><p><strong>Central Administration:</strong> A policy structure where prison education programs are managed through a centralized, statewide system or governing body.</p>
-</li>
-<li><p><strong>Automatic Enrollment:</strong> Policies that automatically enroll eligible incarcerated individuals into educational programs based on literacy level or educational attainment.</p>
-</li>
-</ul>
-<p>The results indicate that expanded access to education through Pell is associated with an estimated <strong>3.3 percentage point reduction in recidivism</strong>. However, policy design plays a more substantial role: among the policies examined, <strong>sentence reduction incentives are associated with a 6.6 percentage point reduction in recidivism</strong>, representing the largest observed effect.</p>
-<p>These findings suggest that while education contributes to rehabilitation, <strong>policies that directly incentivize participation and completion of educational programs are significantly more effective in reducing recidivism</strong>.</p>
+<h1 id="Executive-Summary">Executive Summary<a class="anchor-link" href="#Executive-Summary">¶</a></h1><p>The United States incarcerates approximately 1.9 million individuals, with over 1.25 million in state and federal prisons, the highest rate globally. High recidivism sustains economic and social strain on communities, families, and correctional systems. Education programs are among the most studied tools for reducing reoffending, but the evidence depends on both access and policy design.</p>
+<p>This analysis uses 11.5 million individual prison releases across 34 states from 2005 to 2018, drawn from the National Corrections Reporting Program (NCRP). It examines two pathways: expanded access to college education through the 2016 Second Chance Pell initiative, and cross-state variation in the quality of prison education policy design.</p>
+<p><strong>Pell access.</strong> Pell states experienced a raw 12.2 percentage point decline in two-year recidivism after 2016, compared to a 6.2 point decline in non-Pell states , a raw difference of roughly 6 percentage points. After adding state fixed effects, year effects, and individual controls with state-clustered standard errors, the preferred estimate is a <strong>2.4 percentage point reduction</strong>, which is <strong>not statistically significant</strong> (p = 0.25). The signal is directionally favorable but not conclusive.</p>
+<p><strong>Policy design.</strong> Cross-sectional models relating a composite state policy strength score, and its seven components , to recidivism find <strong>no statistically significant associations</strong> across any specification. With only 33 states providing policy data, the analysis is underpowered for this type of cross-sectional identification.</p>
+<p>The practical implication: expand and sustain education access, but pair it with rigorous evaluation. Policy design effects are not yet clearly detectable in current data.</p>
 </div>
 </div>
 </div>
@@ -7589,22 +7864,25 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Policy-Recommendations">Policy Recommendations<a class="anchor-link" href="#Policy-Recommendations">¶</a></h1><h3 id="1.-Prioritize-Sentence-Reduction-Incentives">1. Prioritize Sentence Reduction Incentives<a class="anchor-link" href="#1.-Prioritize-Sentence-Reduction-Incentives">¶</a></h3><ul>
-<li>Implement or expand policies that reduce prison sentences in exchange for completion of educational programs</li>
-<li>These policies are associated with an estimated <strong>6.6 percentage point reduction in recidivism</strong>, the largest observed effect among the policies analyzed</li>
-<li>Incentive structures appear to directly motivate engagement and completion, leading to stronger rehabilitation outcomes</li>
+<h1 id="Policy-Recommendations">Policy Recommendations<a class="anchor-link" href="#Policy-Recommendations">¶</a></h1><h3 id="1.-Maintain-and-Evaluate-Pell-Access">1. Maintain and Evaluate Pell Access<a class="anchor-link" href="#1.-Maintain-and-Evaluate-Pell-Access">¶</a></h3><ul>
+<li>Continue supporting access to postsecondary education through Pell-funded programs</li>
+<li>The updated estimates point to a <strong>directionally lower</strong> recidivism rate, but the preferred model is <strong>not statistically significant</strong>, so continued evaluation is essential</li>
+<li>Pair program expansion with outcome tracking to identify where and for whom benefits are strongest</li>
 </ul>
-<h3 id="2.-Maintain-and-Expand-Access-to-Educational-Programs">2. Maintain and Expand Access to Educational Programs<a class="anchor-link" href="#2.-Maintain-and-Expand-Access-to-Educational-Programs">¶</a></h3><ul>
-<li>Continue supporting programs such as the <strong>Pell Second Chance Program</strong>, which are associated with reductions in recidivism</li>
-<li>Expanding access ensures that incarcerated individuals have the opportunity to participate in education programs</li>
+<h3 id="2.-Invest-in-Implementation-Quality-and-Participation">2. Invest in Implementation Quality and Participation<a class="anchor-link" href="#2.-Invest-in-Implementation-Quality-and-Participation">¶</a></h3><ul>
+<li>Access alone is unlikely to be sufficient without consistent delivery and participation</li>
+<li>Strengthen program availability across facilities, reduce waitlists, and monitor completion rates</li>
+<li>Track enrollment, attendance, and credential outcomes alongside recidivism</li>
 </ul>
-<h3 id="3.-Combine-Access-with-Incentive-Based-Design">3. Combine Access with Incentive-Based Design<a class="anchor-link" href="#3.-Combine-Access-with-Incentive-Based-Design">¶</a></h3><ul>
-<li>Education access alone is not sufficient to maximize impact. A combination of access and incentivation would produce the best results.</li>
-<li>Policies should be structured to <strong>pair access with clear incentives</strong>, reinforcing participation and completion</li>
+<h3 id="3.-Pilot-Incentive-Based-Policies-with-Clear-Evaluation">3. Pilot Incentive-Based Policies with Clear Evaluation<a class="anchor-link" href="#3.-Pilot-Incentive-Based-Policies-with-Clear-Evaluation">¶</a></h3><ul>
+<li>Incentive structures are plausible but the current data do <strong>not</strong> show a robust effect</li>
+<li>Use small-scale pilots with predefined outcomes rather than broad rollout</li>
+<li>Prioritize designs that can be evaluated using pre-registered metrics and comparison groups</li>
 </ul>
-<h3 id="4.-Deprioritize-Standalone-Structural-Policies">4. Deprioritize Standalone Structural Policies<a class="anchor-link" href="#4.-Deprioritize-Standalone-Structural-Policies">¶</a></h3><ul>
-<li>Policies such as central administration or automatic enrollment, when implemented without incentives, show weaker or negligible associations with recidivism reduction</li>
-<li>These policies may support system organization but should not be relied upon as primary tools for reducing recidivism</li>
+<h3 id="4.-Improve-Data-for-Policy-Design-Decisions">4. Improve Data for Policy Design Decisions<a class="anchor-link" href="#4.-Improve-Data-for-Policy-Design-Decisions">¶</a></h3><ul>
+<li>Current policy indicators are coarse and may not capture implementation intensity</li>
+<li>Collect program-level measures such as instructional hours, credential completion, and staffing ratios</li>
+<li>Better data will allow future analyses to distinguish which policy designs actually improve outcomes</li>
 </ul>
 </div>
 </div>
@@ -7627,10 +7905,9 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Context-and-Background">Context and Background<a class="anchor-link" href="#Context-and-Background">¶</a></h1><p>Prison education programs have existed for centuries, evolving in structure and purpose over time. Early efforts in the 18th and 19th centuries focused on religious instruction and basic literacy, aimed at moral reform and reintegration. By the early 20th century, formal educational programs began to emerge within prisons, including the first college-level courses. A significant shift occurred in the 1930s, when vocational training became central to rehabilitation efforts, reflecting the belief that equipping individuals with practical skills would improve employment outcomes and reduce recidivism. Today, prison education encompasses a wide range of programs, including vocational training, postsecondary education, and life skills development, with substantial variation in implementation across states.</p>
-<p>The role of rehabilitation within the prison system has long been debated. While education programs were initially developed as tools for reform, this perspective has been challenged by periods emphasizing punishment over rehabilitation. This tension is reflected in both policy and research. Access to postsecondary education in prisons was significantly reduced in 1994, when Pell Grant eligibility for incarcerated individuals was removed, leading to a decline in education programs nationwide. In contrast, more recent policy efforts, such as the introduction of the Second Chance Pell initiative in 2015–2016, reflect a renewed emphasis on rehabilitation by expanding access to education within prisons.</p>
-<p>This divide is also evident in the academic literature. Early work, most notably Martinson (1974), questioned whether rehabilitation programs meaningfully reduced recidivism, contributing to skepticism about their effectiveness. Later research, including the Prison Education Research Project (1994), found that participation in educational and vocational programs is associated with lower recidivism, improved employment outcomes, and better institutional behavior.</p>
-<p>While existing research largely supports the role of education in improving rehabilitation outcomes, it primarily focuses on whether education works, rather than how it is implemented. Given the variation in policy design across states, there remains an open question as to which specific policy structures are most effective in reducing recidivism. This analysis addresses that gap by examining how different education-related policies influence reoffending outcomes.</p>
+<h1 id="Context-and-Background">Context and Background<a class="anchor-link" href="#Context-and-Background">¶</a></h1><p>Prison education programs have evolved from 18th-century religious instruction and basic literacy into a broad range of vocational training, secondary education, and postsecondary coursework. A significant shift occurred in 1994, when Pell Grant eligibility for incarcerated individuals was eliminated, causing a sharp decline in college programs nationwide. In 2015–2016, the Second Chance Pell initiative restored access on an experimental basis in participating states, representing the most substantial policy change in prison education in two decades.</p>
+<p>The broader evidence base largely supports education as a tool for rehabilitation. Studies consistently find that participants in prison education programs are less likely to return to prison, though separating program effects from selection - participants may be more motivated to begin with - remains a methodological challenge. This analysis uses the policy change in 2016 as a natural experiment to partially address selection concerns.</p>
+<p>Beyond access, how states structure prison education varies considerably: some require automatic enrollment, some attach sentence reductions to program completion, and some operate programs through centralized school districts. Whether these structural differences predict recidivism outcomes is the second question this analysis addresses.</p>
 </div>
 </div>
 </div>
@@ -7641,7 +7918,10 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Data-and-Approach">Data and Approach<a class="anchor-link" href="#Data-and-Approach">¶</a></h1><p>To understand how education policy affects recidivism, this analysis follows two approaches: first, it examines the implementation of the Pell Second Chance Program as an expansion of access to college-level education in prison; second, it evaluates how variation in state-level policy design is associated with recidivism outcomes. For this, the study uses individual-level data from the National Corrections Reporting Program (NCRP), which tracks prison admissions and releases across U.S. states. Recidivism is defined as a return to prison within two years of release.</p>
+<h1 id="Data-and-Approach">Data and Approach<a class="anchor-link" href="#Data-and-Approach">¶</a></h1><p>This analysis uses individual-level data from the National Corrections Reporting Program (NCRP), covering 11.5 million prison releases across 34 states. The analysis window is 2005–2018. Recidivism is defined as a return to prison within two years of release, measured using each individual's subsequent admission record. The overall two-year recidivism rate in the analysis sample is 26.3%.</p>
+<p>Two complementary analyses are used:</p>
+<p><strong>Pell difference-in-differences.</strong> We compare recidivism trends in 19 Pell-participating states before and after 2016 against trends in 15 non-participating states. State fixed effects absorb persistent differences between states; year fixed effects absorb national trends. Individual controls include offense type, sex, age at admission, and sentence length. Standard errors are clustered by state, since the treatment varies at the state level.</p>
+<p><strong>Policy design cross-section.</strong> We relate a composite state policy strength score (from a 2024 study of state prison education laws) and its seven components to recidivism. These scores do not vary over time, so all identifying variation is across states. With 33 states providing policy data, this is a cross-sectional comparison of roughly 33 units, regardless of individual-level sample size. State fixed effects cannot be included without absorbing all policy variation.</p>
 </div>
 </div>
 </div>
@@ -7652,8 +7932,9 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Methodology-1:-Pell-Second-Chance-Program">Methodology 1: Pell Second Chance Program<a class="anchor-link" href="#Methodology-1:-Pell-Second-Chance-Program">¶</a></h2><p>To evaluate the impact of expanded access to education, this analysis examines the implementation of the Pell Second Chance Program, which restored access to college-level education for incarcerated individuals beginning in 2016.</p>
-<p>The analysis compares recidivism outcomes before and after this policy change between states that adopted Pell-funded education programs and those that did not. This allows us to understand how increased access to postsecondary education is associated with changes in recidivism over time.</p>
+<h2 id="Methodology-1:-Pell-Second-Chance-Program">Methodology 1: Pell Second Chance Program<a class="anchor-link" href="#Methodology-1:-Pell-Second-Chance-Program">¶</a></h2><p>To evaluate the impact of expanded access to education, this analysis examines the Second Chance Pell initiative, which restored access to college-level education for incarcerated individuals beginning in 2016.</p>
+<p>The approach compares recidivism changes in Pell states relative to non-Pell states, controlling for state and year differences and individual characteristics.</p>
+<p>This provides a structured test of whether Pell access is associated with lower recidivism, while acknowledging that other policy changes may also influence trends.</p>
 </div>
 </div>
 </div>
@@ -7664,7 +7945,7 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="Pell Recidivism Plot" src="../plots/pell_plot_05.png"/></p>
+<p><img alt="Pell Recidivism Plot" src="../plots/pell_plot_errorbar.png"/></p>
 </div>
 </div>
 </div>
@@ -7675,9 +7956,9 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>States which implement Pell access are more effective at reducing recidivism by 10.4 percentage points. Specifically, Pell-eligible states see an 11.8% reduction* in recidivism while states without Pell see only 1.4% reduction*. This highlights the substantially larger reduction observed in states with expanded access to postsecondary education.</p>
-<p>To ensure that these comparisons are not driven by differences in the populations being released across states and over time, the analysis accounts for key individual characteristics. Specifically, we control for factors such as age at admission, gender, sentence length, and type of offense.</p>
-<p>This allows the comparison to focus on individuals with similar profiles, reducing the likelihood that differences in recidivism are driven by underlying demographic or criminal characteristics rather than access to education.</p>
+<p>The raw comparison is striking: Pell states saw recidivism fall from 28.4% to 16.2% after 2016, while non-Pell states fell from 25.3% to 19.1% - a raw difference-in-differences of about 6 percentage points. However, some of this decline reflects national trends (visible in both groups) and composition differences between states.</p>
+<p>The preferred model , with state fixed effects, year fixed effects, individual controls, and state-clustered standard errors , estimates a <strong>2.4 percentage point reduction</strong> in recidivism for Pell states, and this estimate is <strong>not statistically significant</strong> (p = 0.25, 95% CI: −6.5 to +1.7 pp).</p>
+<p>This means the Pell signal is <strong>directionally favorable but not conclusive</strong>. The estimate shrinks when national trends and persistent state differences are controlled for. Additionally, the post-2016 period overlaps with other criminal justice reforms, so the estimate cannot be attributed solely to Pell expansion.</p>
 </div>
 </div>
 </div>
@@ -7688,49 +7969,15 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Methodology-2:-State-Policy-Design">Methodology 2: State Policy Design<a class="anchor-link" href="#Methodology-2:-State-Policy-Design">¶</a></h2><p>To understand how different approaches to prison education influence recidivism, this analysis examines variation in policy design across states. Rather than focusing only on access to education, this approach evaluates how specific policy structures are associated with recidivism outcomes.</p>
-<p>Across the policy types examined, we observe reductions in recidivism associated with education-focused policies. In particular, sentence reduction incentives are associated with an estimated <strong>6–7 percentage point decrease</strong> in recidivism, while automatic enrollment and centralized administration show smaller effects.</p>
-<p>Given this variation, we focus on <strong>sentence reduction incentives</strong> as the primary policy of interest.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b4dbc6d1">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="Sentence Reduction Effect" src="../plots/sentence_reduction_plot.png"/></p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b7bd557d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>States that offer sentence reduction incentives exhibit approximately <strong>17% lower recidivism</strong> compared to states without such incentives. This corresponds to a reduction of about <strong>5 percentage points</strong>, indicating that incentive-based education policies are associated with meaningfully improved post-release outcomes.</p>
-<p>Additional Explorations:</p>
-<p>Consistent with prior evidence, recidivism decreases with age at admission, indicating that younger individuals face higher risks of reoffending.</p>
-<p>We also observe that female individuals have lower recidivism rates compared to males.</p>
-<p>Recidivism rates vary across offense types, reinforcing the importance of accounting for differences in criminal behavior when evaluating policy impacts.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=169c770f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Taken together, the results suggest that both <strong>access to education</strong> and <strong>policy design</strong> play important but distinct roles in reducing recidivism.</p>
-<p>The expansion of Pell-funded programs is associated with meaningful declines in recidivism, indicating that increasing access to postsecondary education can improve post-release outcomes. However, the analysis of state-level policies shows that <strong>how education is structured also matters</strong>. In particular, sentence reduction incentives—policies that directly reward participation—are associated with the largest reductions in recidivism.</p>
-<p>This suggests that while access is necessary, it may not be sufficient on its own. Policies that actively <strong>encourage and incentivize engagement</strong> appear to amplify the benefits of education programs.</p>
-<p>Together, these findings point toward a complementary approach: expanding access to education while designing policies that motivate participation can lead to stronger and more consistent reductions in recidivism.</p>
+<h2 id="Methodology-2:-State-Policy-Design">Methodology 2: State Policy Design<a class="anchor-link" href="#Methodology-2:-State-Policy-Design">¶</a></h2><p>This section asks whether states with stronger prison education policies have lower recidivism. A composite score from a 2024 study rates each state across seven dimensions: adult basic education, secondary education, vocational programs, college programs, automatic enrollment, school district structure, and sentence reduction incentives.</p>
+<p><strong>The results show no statistically significant association</strong> between policy strength and recidivism , neither the composite score nor any individual component reaches conventional significance across individual-level or state-year weighted models.</p>
+<p>Three interpretations are consistent with this null result:</p>
+<ol>
+<li><strong>Underpowered.</strong> Cross-sectional identification across 33 states cannot reliably detect a modest effect, even with millions of individual observations. The effective sample for inference is the number of state clusters.</li>
+<li><strong>Measurement error.</strong> The 2024 policy scores may not accurately represent each state's policies during 2005–2018. Mismeasurement of this kind attenuates estimates toward zero.</li>
+<li><strong>No detectable effect.</strong> State-level policy quality, as scored here, may not independently predict recidivism after accounting for national year trends.</li>
+</ol>
+<p>These three explanations cannot be distinguished with the current data. The null should be interpreted as inconclusive, not as evidence that policy design is irrelevant.</p>
 </div>
 </div>
 </div>
@@ -7741,10 +7988,11 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Limitations">Limitations<a class="anchor-link" href="#Limitations">¶</a></h1><p>While the findings point to meaningful reductions in recidivism associated with education policies, several important limitations should be considered.</p>
-<p>First, education programs represent only one component of the broader reentry process. Recidivism is influenced by a range of factors, including employment opportunities, housing stability, social support, and post-release supervision. As such, education policies should not be viewed as a standalone solution or expected to fully address reoffending outcomes.</p>
-<p>Second, there may be a gap between policy design and actual program availability. In some cases, states mandate participation in educational programs without ensuring that such programs are consistently available across facilities. For example, several states require certain types of prison education while maintaining facilities that do not appear to offer them. This highlights the importance of not only policy adoption, but also <strong>effective implementation, enforcement, and monitoring</strong> to ensure that intended programs reach incarcerated individuals.</p>
-<p>Finally, the reintroduction of Pell-funded prison education programs is relatively recent. While early results are promising, particularly following the 2016 revival, the full effects may not yet be fully realized. Continued evaluation—especially in light of the 2024 expansion of the Pell program to additional institutions—will be important to assess long-term impacts.</p>
+<h1 id="Limitations">Limitations<a class="anchor-link" href="#Limitations">¶</a></h1><p><strong>Right-censoring.</strong> Individuals released in 2017–2018 had limited time to return to prison before the data end. The preferred models include year fixed effects that absorb most of this, but post-2016 recidivism estimates should be interpreted with some caution.</p>
+<p><strong>Policy score timing.</strong> The 2024 policy scores represent states' current education law quality, not their policies during 2005–2018. States that reformed their programs over this period are misrepresented in the cross-sectional analysis, biasing estimates toward zero.</p>
+<p><strong>Cross-sectional identification.</strong> The policy design analysis cannot rule out omitted state-level confounders , states with stronger education policies may differ on incarceration philosophy, demographics, or funding in ways that also affect recidivism.</p>
+<p><strong>Confounded post-2016 period.</strong> The Pell expansion coincided with broader criminal justice reforms. Changes in recidivism after 2016 cannot be attributed solely to education access.</p>
+<p><strong>Program quality vs. policy presence.</strong> A state can adopt a policy without implementing it well. The current data measures policy presence, not program intensity, which weakens the link between policy scores and outcomes.</p>
 </div>
 </div>
 </div>
@@ -7755,14 +8003,14 @@ p {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">¶</a></h1><p>This analysis finds that prison education policies are associated with meaningful reductions in recidivism, with both expanded access and policy design playing important roles. The reintroduction of Pell-funded programs is linked to improved outcomes, while incentive-based policies—particularly sentence reduction for educational participation—show the strongest associations with reduced reoffending.</p>
-<p>Together, these findings suggest that effective prison education policy should not only expand access to programs, but also actively encourage participation through well-designed incentives.</p>
-<p>As states continue to invest in rehabilitation, aligning access with incentives and ensuring consistent implementation will be critical to achieving sustained reductions in recidivism and supporting successful reintegration.</p>
+<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">¶</a></h1><p>Across 11.5 million individual releases and 34 states, this analysis finds a directionally favorable but statistically inconclusive association between the 2016 Pell expansion and reduced two-year recidivism. The preferred estimate, 2.4 percentage points, p = 0.25 , shrinks substantially from the raw 6 percentage point gap once national trends and state differences are controlled for. The policy design analysis, limited to 33-state cross-sectional variation, finds no significant associations for any policy component.</p>
+<p>The honest summary is that this data does not produce a definitive verdict. The Pell signal is too uncertain to cite as proof of effect, but it is consistent enough to justify sustained investment. The policy design null is too underpowered to rule out real effects.</p>
+<p><strong>The practical path forward is clear regardless of these uncertainties:</strong> maintain and expand education access, build in outcome tracking, and invest in the data infrastructure needed to identify what works and for whom. The question is not whether to fund education in prisons , the directional evidence, combined with the broader literature, supports it. The question is how to design programs and measure them well enough to improve over time.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3751c408">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=683b3869">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
